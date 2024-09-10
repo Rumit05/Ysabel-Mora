@@ -1,0 +1,18 @@
+query RunInput {
+  localization {
+    language {
+      isoCode
+    }
+  }
+  cart {
+    cost {
+      totalAmount {
+        amount
+      }
+    }
+  }
+  paymentMethods {
+    id
+    name
+  }
+}
