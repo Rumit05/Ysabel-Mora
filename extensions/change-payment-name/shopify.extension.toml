@@ -1,8 +1,11 @@
-api_version = "2024-07"
+api_version = "2025-04"
 
 [[extensions]]
 name = "t:name"
 handle = "change-payment-name"
+
+uid = "deefa3f2-b5ce-c634-e01a-87d313d58c9022cb7436"
+
 type = "function"
 
 description = "t:description"
