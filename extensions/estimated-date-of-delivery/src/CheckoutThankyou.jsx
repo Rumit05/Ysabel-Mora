@@ -14,10 +14,8 @@ function ThankYou() {
   const { orderConfirmation } = useExtensionApi();
   const { settings } = useApi();
 
-  const orderIdInfo = orderConfirmation.current.order.id;     
-  const orderId = orderIdInfo.replace("OrderIdentity","Order");    
-  console.log(orderId,"orderId111orderId")
-
+  const orderId = orderConfirmation.current.order.id;    
+  // const orderIdInfo = orderConfirmation.current.id;     
   const orderNumber = orderConfirmation.current.number;
 
   const [orderDetails, setOrderDetails] = useState(null);
