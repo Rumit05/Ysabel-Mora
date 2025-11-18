@@ -16,7 +16,6 @@ function ThankYou() {
 
   const orderIdInfo = orderConfirmation.current.order.id;     
   const orderId = orderIdInfo.replace("OrderIdentity","Order");    
-  console.log(orderId,"orderId111orderId")
 
   const orderNumber = orderConfirmation.current.number;
 
