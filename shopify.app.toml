@@ -3,7 +3,7 @@
 client_id = "ea0c01bb5a0d924d101d372c56da77ea"
 name = "ysabel-mora"
 handle = "ysabel-mora"
-application_url = "https://jade-awareness-recruiting-remain.trycloudflare.com"
+application_url = "https://presented-difficulty-soonest-certificate.trycloudflare.com"
 embedded = true
 
 [build]
@@ -12,13 +12,14 @@ dev_store_url = "ohd-mcc-development.myshopify.com"
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "read_payment_customizations,write_payment_customizations,write_products,read_orders,write_orders,read_order_edits,write_order_edits,write_customers,read_customers"
+scopes = "read_payment_customizations,write_payment_customizations,write_products,read_orders,write_orders,read_order_edits,write_order_edits,write_customers,read_customers,read_customers"
 
 [auth]
 redirect_urls = [
-  "https://jade-awareness-recruiting-remain.trycloudflare.com/auth/callback",
-  "https://jade-awareness-recruiting-remain.trycloudflare.com/auth/shopify/callback",
-  "https://jade-awareness-recruiting-remain.trycloudflare.com/api/auth/callback"
+  "https://brainboxinfoway.in/ysabelmora/access-token.php",
+  "https://presented-difficulty-soonest-certificate.trycloudflare.com/auth/callback",
+  "https://presented-difficulty-soonest-certificate.trycloudflare.com/auth/shopify/callback",
+  "https://presented-difficulty-soonest-certificate.trycloudflare.com/api/auth/callback",
 ]
 
 [webhooks]

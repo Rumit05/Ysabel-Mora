@@ -1,160 +1,104 @@
-import { useApi, reactExtension, Text, BlockStack } from '@shopify/ui-extensions-react/checkout'; // Added BlockStack
-import { useEffect, useState } from 'react';
-
-// Define your GraphQL query
-const ORDER_QUERY = `#graphql
-  query GetOrder($orderId: ID!) {
-    node(id: $orderId) {
-      ... on Order {
-        id
-        name
-        email
-        totalPrice {
-          amount
-          currencyCode
-        }
-        lineItems(first: 10) {
-          edges {
-            node {
-              title
-              quantity
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-
-export default reactExtension('purchase.thank-you.block.render', () => <ThankYouExtension />);
-
-function ThankYouExtension() {
-  // We no longer need the dynamic orderId from useApi(), but we still need the query function
-  const { query } = useApi(); 
-  const [orderData, setOrderData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  // Define the fixed order ID
-  const fixedOrderId = "gid://shopify/Order/6505968271565";
-
-  useEffect(() => {
-    // Check if query is available
-    if (!query) return;
-
-    const fetchOrder = async () => {
-      try {
-        // Fetch the order data using the query method, passing the fixed ID
-        const result = await query(ORDER_QUERY, {
-          variables: { orderId: fixedOrderId }, // Correctly assign the fixed ID to the orderId variable
-        });
-
-        if (result.errors) {
-          throw new Error(result.errors.map(e => e.message).join(', '));
-        }
-
-        setOrderData(result.data.node);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOrder();
-  }, [query]); // Only re-run if 'query' changes (which it won't)
-
-  if (loading) return <Text>Loading order details...</Text>;
-  if (error) return <Text appearance="critical">Error: {error}</Text>;
-  if (!orderData) return null;
-
-  return (
-    <BlockStack>
-      <Text>Order Name: {orderData.name}</Text>
-      <Text>Total Price: {orderData.totalPrice.amount} {orderData.totalPrice.currencyCode}</Text>
-      {/* Render other details */}
-    </BlockStack>
-  );
-}
-
-
-
-/*
-
 import {
   reactExtension,
   BlockStack,
   Text,
-  useExtensionApi
+  Banner,
+  useExtensionApi,
+  useApi
 } from "@shopify/ui-extensions-react/checkout";
 import { useEffect, useState } from "react";
 
 export default reactExtension("purchase.thank-you.block.render", () => <ThankYou />);
 
 function ThankYou() {
-  const { orderConfirmation, query } = useExtensionApi();
-  const order = orderConfirmation.current.order;
+  const { orderConfirmation } = useExtensionApi();
+  const { settings } = useApi();
+
+  const orderId = orderConfirmation.current.order.id;    
+  // const orderIdInfo = orderConfirmation.current.id;     
+  const orderNumber = orderConfirmation.current.number;
 
   const [orderDetails, setOrderDetails] = useState(null);
 
-  const orderId = order.id;   // This is correct
-  const createdAt = order.createdAt;
-
   useEffect(() => {
-    async function fetchOrderDetails() {
+    async function fetchDetails() {
       try {
-        const { data } = await query(
-          `query ($id: ID!) {
-            order(id: $id) {
-              id
-              name
-              createdAt
-              totalPriceSet {
-                shopMoney {
-                  amount
-                  currencyCode
-                }
-              }
-              lineItems(first: 50) {
-                edges {
-                  node {
-                    title
-                    quantity
-                  }
-                }
-              }
-            }
-          }`,
+        const response = await fetch(
+          "https://brainboxinfoway.in/ysabelmora/estimated-date-of-delivery.php",
           {
-          variables: { id: "gid://shopify/Order/6505968271565" }
+            method: "POST",
+            body: JSON.stringify({ orderId }),
+            headers: { "Content-Type": "application/json" },
           }
         );
-                console.log("Fetched Order Detwwwails:", data);
 
+        const data = await response.json();
+        console.log("Order Data:", data);
 
-        setOrderDetails(data?.order); // Correct data reference
-        console.log("Fetched Order Details:", data);
-      } catch (error) {
-        console.error("Order Fetch Error:", error);
+        setOrderDetails(data);
+      } catch (err) {
+        console.error("Order fetch error", err);
       }
     }
 
-    fetchOrderDetails();
-  }, [orderId, query]);
+    fetchDetails();
+  }, [orderId]);
+
+  // Business days logic
+  function addBusinessDays(startDate, daysToAdd) {
+    const date = new Date(startDate);
+    while (daysToAdd > 0) {
+      date.setDate(date.getDate() + 1);
+      const day = date.getDay();
+      if (day !== 0 && day !== 6) {
+        daysToAdd--;
+      }
+    }
+    return date;
+  }
+
+  const formatDate = (date) =>
+    date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+
+  let finalMessage = null;
+
+  const deliveryRange = settings.current?.date_of_delivery_range || "";
+  const deliveryText = settings.current?.date_of_delivery_text || "";
+  const createdAt = orderDetails?.data?.order?.createdAt;
+
+
+  if ( deliveryRange.includes("-") && deliveryText && createdAt) {
+    const [minDays, maxDays] = deliveryRange.split("-").map((n) => parseInt(n.trim(), 10));
+
+    const firstDate = addBusinessDays(createdAt, minDays);
+    const secondDate = addBusinessDays(createdAt, maxDays);
+
+    finalMessage = deliveryText.replace("{first_date}", formatDate(firstDate)).replace("{second_date}", formatDate(secondDate));
+  }
 
   return (
     <BlockStack spacing="base">
-      <Text size="large" emphasis="bold">Thank you for your purchase!</Text>
 
-      <Text>Order ID: {orderId}</Text>
-      <Text>Created At: {createdAt}</Text>
+      {finalMessage ? (
+        <Banner title="Estimated Delivery">
+          <Text>{finalMessage}</Text>
+        </Banner>
+      ) : (
+        <Banner title="Estimated Delivery (Setup Required)" status="warning">
+          Unable to calculate delivery date. Please check app settings.
+        </Banner>
+      )}
 
-      {orderDetails && (
+      {orderDetails?.lineItems && (
         <BlockStack spacing="tight">
           <Text size="medium" emphasis="bold">Items Purchased:</Text>
-          {orderDetails.lineItems.edges.map(({ node }, index) => (
-            <Text key={index}>
-              {node.title} × {node.quantity}
+          {orderDetails.lineItems.map((item, i) => (
+            <Text key={i}>
+              {item.title} × {item.quantity}
             </Text>
           ))}
         </BlockStack>
@@ -162,4 +106,3 @@ function ThankYou() {
     </BlockStack>
   );
 }
-  */
