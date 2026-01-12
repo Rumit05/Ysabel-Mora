@@ -25,7 +25,7 @@ function ThankYou() {
     async function fetchDetails() {
       try {
         const response = await fetch(
-          "https://brainboxinfoway.in/ysabelmora/estimated-date-of-delivery.php",
+          "https://brainboxinfoway.in/ysabelmora/ysabelmora-estimated-date-of-delivery.php",
           {
             method: "POST",
             body: JSON.stringify({ orderId }),
@@ -59,9 +59,9 @@ function ThankYou() {
   }
 
   const formatDate = (date) =>
-    date.toLocaleDateString("en-US", {
+    date.toLocaleDateString("es-ES", {
       year: "numeric",
-      month: "short",
+      month: "long",
       day: "numeric",
     });
 
@@ -85,7 +85,7 @@ function ThankYou() {
     <BlockStack spacing="base">
 
       {finalMessage ? (
-        <Banner title="Estimated Delivery">
+        <Banner title="Entrega estimada">
           <Text>{finalMessage}</Text>
         </Banner>
       ) : (

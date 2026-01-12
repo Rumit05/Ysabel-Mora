@@ -3,7 +3,7 @@
 client_id = "ea0c01bb5a0d924d101d372c56da77ea"
 name = "ysabel-mora"
 handle = "ysabel-mora"
-application_url = "https://presented-difficulty-soonest-certificate.trycloudflare.com"
+application_url = "https://tattoo-chapter-eliminate-basics.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,10 @@ scopes = "read_payment_customizations,write_payment_customizations,write_product
 [auth]
 redirect_urls = [
   "https://brainboxinfoway.in/ysabelmora/access-token.php",
-  "https://presented-difficulty-soonest-certificate.trycloudflare.com/auth/callback",
-  "https://presented-difficulty-soonest-certificate.trycloudflare.com/auth/shopify/callback",
-  "https://presented-difficulty-soonest-certificate.trycloudflare.com/api/auth/callback",
+  "https://tattoo-chapter-eliminate-basics.trycloudflare.com/auth/callback",
+  "https://tattoo-chapter-eliminate-basics.trycloudflare.com/auth/shopify/callback",
+  "https://tattoo-chapter-eliminate-basics.trycloudflare.com/api/auth/callback",
+  "https://brainboxinfoway.in/ysabelmora/Ysabelmora-access-token.php"
 ]
 
 [webhooks]

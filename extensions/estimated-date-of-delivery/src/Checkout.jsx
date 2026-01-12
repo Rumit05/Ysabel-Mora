@@ -48,18 +48,19 @@ function Extension() {
   const secondDate = addBusinessDays(today, maxDays);
 
   const formatDate = (date) =>
-    date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
+  date.toLocaleDateString("es-ES", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
 
   // Replace placeholders safely
   const finalMessage = dateOfDeliveryText.replace("{first_date}", formatDate(firstDate)).replace("{second_date}", formatDate(secondDate));
 
   return (
     <BlockStack border={"dotted"} padding={"tight"}>
-      <Banner title="Estimated Delivery">
+      <Banner title="Entrega estimada">
         <Text>{finalMessage}</Text>
       </Banner>
     </BlockStack>
