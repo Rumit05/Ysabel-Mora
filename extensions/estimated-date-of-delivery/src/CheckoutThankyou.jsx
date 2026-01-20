@@ -12,7 +12,9 @@ export default reactExtension("purchase.thank-you.block.render", () => <ThankYou
 
 function ThankYou() {
   const { orderConfirmation } = useExtensionApi();
-  const { settings } = useApi();
+  const { settings , localization } = useApi();
+  const languageCode = localization.language.current.isoCode.split("-")[0];
+
 
   const orderIdInfo = orderConfirmation.current.order.id;     
   const orderId = orderIdInfo.replace("OrderIdentity","Order");    
@@ -59,7 +61,8 @@ function ThankYou() {
   }
 
   const formatDate = (date) =>
-    date.toLocaleDateString("es-ES", {
+    date.toLocaleDateString(languageCode, {
+      weekday: "long",
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -67,8 +70,20 @@ function ThankYou() {
 
   let finalMessage = null;
 
+  let deliveryText = "";
+  if (languageCode === "es") {
+    deliveryText = settings.current.date_of_delivery_text_es?.trim() ?? "";
+  } else if (languageCode === "en") {
+    deliveryText = settings.current.date_of_delivery_text_en?.trim() ?? "";
+  } else if (languageCode === "it") {
+    deliveryText = settings.current.date_of_delivery_text_it?.trim() ?? "";
+  } else if (languageCode === "fr") {
+    deliveryText = settings.current.date_of_delivery_text_fr?.trim() ?? "";
+  } else if (languageCode === "pt") {
+    deliveryText = settings.current.date_of_delivery_text_pt?.trim() ?? "";
+  }
+
   const deliveryRange = settings.current?.date_of_delivery_range || "";
-  const deliveryText = settings.current?.date_of_delivery_text || "";
   const createdAt = orderDetails?.data?.order?.createdAt;
 
 

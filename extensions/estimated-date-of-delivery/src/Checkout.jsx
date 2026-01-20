@@ -13,10 +13,27 @@ export default reactExtension("purchase.checkout.block.render", () => (
 ));
 
 function Extension() {
-  const { settings } = useApi();
+  const { settings , localization } = useApi();
+  const languageCode = localization.language.current.isoCode.split("-")[0];
+  const esdateOfDeliveryText = settings.current.date_of_delivery_text_es?.trim() ?? "";
+  const endateOfDeliveryText = settings.current.date_of_delivery_text_en?.trim() ?? "";
+  const itdateOfDeliveryText = settings.current.date_of_delivery_text_it?.trim() ?? "";
+  const frdateOfDeliveryText = settings.current.date_of_delivery_text_fr?.trim() ?? ""
+  const ptdateOfDeliveryText = settings.current.date_of_delivery_text_pt?.trim() ?? ""
 
+  let dateOfDeliveryText = "";
+  if (languageCode === "es") {
+    dateOfDeliveryText = esdateOfDeliveryText;
+  } else if (languageCode === "en") {
+    dateOfDeliveryText = endateOfDeliveryText;
+  } else if (languageCode === "it") {
+    dateOfDeliveryText = itdateOfDeliveryText;
+  } else if (languageCode === "fr") {
+    dateOfDeliveryText = frdateOfDeliveryText;
+  } else if (languageCode === "pt") {
+    dateOfDeliveryText = ptdateOfDeliveryText;
+  }
   const dateOfDeliveryRange = settings.current?.date_of_delivery_range || "";
-  const dateOfDeliveryText = settings.current?.date_of_delivery_text || "";
 
   // Prevent errors when settings not configured
   if (!dateOfDeliveryRange || !dateOfDeliveryRange.includes("-") || !dateOfDeliveryText) {
@@ -48,11 +65,12 @@ function Extension() {
   const secondDate = addBusinessDays(today, maxDays);
 
   const formatDate = (date) =>
-  date.toLocaleDateString("es-ES", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+    date.toLocaleDateString(languageCode, {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
 
 
   // Replace placeholders safely

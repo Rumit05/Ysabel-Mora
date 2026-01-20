@@ -60,9 +60,33 @@ name = "Estimated Delivery Range (Days)"
 description = "Enter day range in this format: 3 - 5"
 
 [[extensions.settings.fields]]
-key = "date_of_delivery_text"
+key = "date_of_delivery_text_es"
 type = "single_line_text_field"
-name = "Estimated Delivery Message"
+name = "Estimated Delivery Message[ES]"
+description = "Enter the display text. Example: Your order will be delivered between {first_date} and {second_date}."
+
+[[extensions.settings.fields]]
+key = "date_of_delivery_text_en"
+type = "single_line_text_field"
+name = "Estimated Delivery Message [EN]"
 description = "Enter the display text. Example: Your order will be delivered between {first_date} and {second_date}."
 
 
+[[extensions.settings.fields]]
+key = "date_of_delivery_text_it"
+type = "single_line_text_field"
+name = "Estimated Delivery Message [IT]"
+description = "Enter the display text. Example: Your order will be delivered between {first_date} and {second_date}."
+
+
+[[extensions.settings.fields]]
+key = "date_of_delivery_text_fr"
+type = "single_line_text_field"
+name = "Estimated Delivery Message [FR]"
+description = "Enter the display text. Example: Your order will be delivered between {first_date} and {second_date}."
+
+[[extensions.settings.fields]]
+key = "date_of_delivery_text_pt"
+type = "single_line_text_field"
+name = "Estimated Delivery Message [PT]"
+description = "Enter the display text. Example: Your order will be delivered between {first_date} and {second_date}."
