@@ -1,0 +1,167 @@
+{% comment %} ============================================================================================== {% endcomment %}
+{% comment %} GLOBAL DATE LOGIC (CALCULATED ONCE) {% endcomment %}
+{% comment %} ============================================================================================== {% endcomment %}
+
+{% assign base_date = order.created_at | date: "%s" %}
+{% assign one_day = 86400 %}
+{% assign add_days = 1 | times: one_day %}
+{% assign temp_date = base_date | plus: add_days %}
+
+{% assign total_working_days = 0 %}
+{% assign current_timestamp = temp_date %}
+
+{% for i in (1..10) %}
+  {% assign day_name = current_timestamp | date: "%A" %}
+  {% if day_name != "Saturday" and day_name != "Sunday" %}
+    {% assign total_working_days = total_working_days | plus: 1 %}
+  {% endif %}
+  {% assign current_timestamp = current_timestamp | plus: one_day %}
+  {% if total_working_days >= 5 %}
+    {% break %}
+  {% endif %}
+{% endfor %}
+
+{% assign working_count = 0 %}
+{% assign delivery_start = nil %}
+{% assign delivery_end = nil %}
+{% assign date_iter = base_date | plus: add_days %}
+
+{% for i in (1..15) %}
+  {% assign day_name = date_iter | date: "%A" %}
+  {% if day_name != "Saturday" and day_name != "Sunday" %}
+    {% assign working_count = working_count | plus: 1 %}
+    {% if working_count == 3 %}
+      {% assign delivery_start = date_iter %}
+    {% elsif working_count == 5 %}
+      {% assign delivery_end = date_iter %}
+    {% endif %}
+  {% endif %}
+  {% assign date_iter = date_iter | plus: one_day %}
+  {% if working_count >= 5 %}
+    {% break %}
+  {% endif %}
+{% endfor %}
+
+{% assign start_day_index = delivery_start | date: "%w" | plus: 0 %}
+{% assign end_day_index = delivery_end | date: "%w" | plus: 0 %}
+{% assign start_day = delivery_start | date: "%-d" %}
+{% assign start_year = delivery_start | date: "%Y" %}
+{% assign end_day = delivery_end | date: "%-d" %}
+{% assign end_year = delivery_end | date: "%Y" %}
+{% assign start_month_index = delivery_start | date: "%m" | minus: 1 %}
+{% assign end_month_index = delivery_end | date: "%m" | minus: 1 %}
+
+{% comment %} ============================================================================================== {% endcomment %}
+{% comment %} ENGLISH VERSION {% endcomment %}
+{% comment %} ============================================================================================== {% endcomment %}
+
+{% assign days_en = "Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday" | split: "," %}
+{% assign months_en = "January,February,March,April,May,June,July,August,September,October,November,December" | split: "," %}
+
+{% assign start_day_name = days_en[start_day_index] %}
+{% assign start_month = months_en[start_month_index] %}
+{% capture delivery_start_en %}{{ start_day_name }}, {{ start_month }} {{ start_day }}, {{ start_year }}{% endcapture %}
+
+{% assign end_day_name = days_en[end_day_index] %}
+{% assign end_month = months_en[end_month_index] %}
+{% capture delivery_end_en %}{{ end_day_name }}, {{ end_month }} {{ end_day }}, {{ end_year }}{% endcapture %}
+
+{% capture email_title %}
+  <h2> Estimated Delivery </h2>
+  <p>
+    Your order will be delivered between {{ delivery_start_en }} and {{ delivery_end_en }}.
+  </p> <br/>
+  Thanks for your purchase!
+{% endcapture %}
+
+{% comment %} ============================================================================================== {% endcomment %}
+{% comment %} PORTUGUESE VERSION {% endcomment %}
+{% comment %} ============================================================================================== {% endcomment %}
+
+{% assign days_pt = "domingo,segunda-feira,terça-feira,quarta-feira,quinta-feira,sexta-feira,sábado" | split: "," %}
+{% assign months_pt = "janeiro,fevereiro,março,abril,maio,junho,julho,agosto,setembro,outubro,novembro,dezembro" | split: "," %}
+
+{% assign start_day_name = days_pt[start_day_index] %}
+{% assign start_month = months_pt[start_month_index] %}
+{% capture delivery_start_pt %}{{ start_day_name }} {{ start_day }} de {{ start_month }} de {{ start_year }}{% endcapture %}
+
+{% assign end_day_name = days_pt[end_day_index] %}
+{% assign end_month = months_pt[end_month_index] %}
+{% capture delivery_end_pt %}{{ end_day_name }} {{ end_day }} de {{ end_month }} de {{ end_year }}{% endcapture %}
+
+{% capture email_title %}
+  <h2> Entrega estimada </h2>
+  <p>
+    A sua encomenda será entregue entre {{ delivery_start_pt }} e {{ delivery_end_pt }}.
+  </p> <br/>
+  Obrigado pela sua compra!
+{% endcapture %}
+
+{% comment %} ============================================================================================== {% endcomment %}
+{% comment %} FRENCH VERSION {% endcomment %}
+{% comment %} ============================================================================================== {% endcomment %}
+
+{% assign days_fr = "dimanche,lundi,mardi,mercredi,jeudi,vendredi,samedi" | split: "," %}
+{% assign months_fr = "janvier,février,mars,avril,mai,juin,juillet,août,septembre,octobre,novembre,décembre" | split: "," %}
+
+{% assign start_day_name = days_fr[start_day_index] %}
+{% assign start_month = months_fr[start_month_index] %}
+{% capture delivery_start_fr %}{{ start_day_name }} {{ start_day }} {{ start_month }} {{ start_year }}{% endcapture %}
+
+{% assign end_day_name = days_fr[end_day_index] %}
+{% assign end_month = months_fr[end_month_index] %}
+{% capture delivery_end_fr %}{{ end_day_name }} {{ end_day }} {{ end_month }} {{ end_year }}{% endcapture %}
+
+{% capture email_title %}
+  <h2> Livraison estimée </h2>
+  <p>
+    Votre commande sera livrée entre le {{ delivery_start_fr }} et le {{ delivery_end_fr }}.
+  </p> <br/>
+  Merci pour votre achat !
+{% endcapture %}
+
+{% comment %} ============================================================================================== {% endcomment %}
+{% comment %} ITALIAN VERSION {% endcomment %}
+{% comment %} ============================================================================================== {% endcomment %}
+
+{% assign days_it = "domenica,lunedì,martedì,mercoledì,giovedì,venerdì,sabato" | split: "," %}
+{% assign months_it = "gennaio,febbraio,marzo,aprile,maggio,giugno,luglio,agosto,settembre,ottobre,novembre,dicembre" | split: "," %}
+
+{% assign start_day_name = days_it[start_day_index] %}
+{% assign start_month = months_it[start_month_index] %}
+{% capture delivery_start_it %}{{ start_day_name }} {{ start_day }} {{ start_month }} {{ start_year }}{% endcapture %}
+
+{% assign end_day_name = days_it[end_day_index] %}
+{% assign end_month = months_it[end_month_index] %}
+{% capture delivery_end_it %}{{ end_day_name }} {{ end_day }} {{ end_month }} {{ end_year }}{% endcapture %}
+
+{% capture email_title %}
+  <h2> Consegna stimata </h2>
+  <p>
+    Il tuo ordine sarà consegnato tra il {{ delivery_start_it }} e il {{ delivery_end_it }}.
+  </p> <br/>
+  Grazie per il tuo acquisto!
+{% endcapture %}
+
+{% comment %} ============================================================================================== {% endcomment %}
+{% comment %} SPANISH VERSION {% endcomment %}
+{% comment %} ============================================================================================== {% endcomment %}
+
+{% assign days_es = "domingo,lunes,martes,miércoles,jueves,viernes,sábado" | split: "," %}
+{% assign months_es = "enero,febrero,marzo,abril,mayo,junio,julio,agosto,septiembre,octubre,noviembre,diciembre" | split: "," %}
+
+{% assign start_day_name = days_es[start_day_index] %}
+{% assign start_month = months_es[start_month_index] %}
+{% capture delivery_start_es %}{{ start_day_name }} {{ start_day }} de {{ start_month }} de {{ start_year }}{% endcapture %}
+
+{% assign end_day_name = days_es[end_day_index] %}
+{% assign end_month = months_es[end_month_index] %}
+{% capture delivery_end_es %}{{ end_day_name }} {{ end_day }} de {{ end_month }} de {{ end_year }}{% endcapture %}
+
+{% capture email_title %}
+  <h2> Entrega estimada </h2>
+  <p>
+    Su pedido será entregado entre el {{ delivery_start_es }} y el {{ delivery_end_es }}.
+  </p> <br/>
+  ¡Gracias por tu compra!
+{% endcapture %}

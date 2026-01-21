@@ -64,13 +64,15 @@ function Extension() {
   const firstDate = addBusinessDays(today, minDays);
   const secondDate = addBusinessDays(today, maxDays);
 
-  const formatDate = (date) =>
-    date.toLocaleDateString(languageCode, {
+  const formatDate = (date) => {
+    const formatted = date.toLocaleDateString(languageCode, {
       weekday: "long",
       year: "numeric",
       month: "long",
       day: "numeric",
     });
+    return formatted.replace(/,/g, "");
+  };
 
 
   // Replace placeholders safely

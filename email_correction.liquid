@@ -1,0 +1,89 @@
+{% assign base_date = order.created_at | date: "%s" %}
+{% assign one_day = 86400 %}
+{% assign add_days = 1 | times: one_day %}
+{% assign temp_date = base_date | plus: add_days %}
+
+{% assign total_working_days = 0 %}
+{% assign current_timestamp = temp_date %}
+
+{% for i in (1..10) %}
+  {% assign day_name = current_timestamp | date: "%A" %}
+  {% if day_name != "Saturday" and day_name != "Sunday" %}
+    {% assign total_working_days = total_working_days | plus: 1 %}
+  {% endif %}
+  {% assign current_timestamp = current_timestamp | plus: one_day %}
+  {% if total_working_days >= 5 %}
+    {% break %}
+  {% endif %}
+{% endfor %}
+
+{% assign working_count = 0 %}
+{% assign delivery_start = nil %}
+{% assign delivery_end = nil %}
+{% assign date_iter = base_date | plus: add_days %}
+
+{% for i in (1..15) %}
+  {% assign day_name = date_iter | date: "%A" %}
+  {% if day_name != "Saturday" and day_name != "Sunday" %}
+    {% assign working_count = working_count | plus: 1 %}
+    {% if working_count == 3 %}
+      {% assign delivery_start = date_iter %}
+    {% elsif working_count == 5 %}
+      {% assign delivery_end = date_iter %}
+    {% endif %}
+  {% endif %}
+  {% assign date_iter = date_iter | plus: one_day %}
+  {% if working_count >= 5 %}
+    {% break %}
+  {% endif %}
+{% endfor %}
+
+{% assign delivery_method_types = delivery_agreements | map: 'delivery_method_type' | uniq %}
+{% if delivery_method_types.size > 1 %}
+  {% assign has_split_cart = true %}
+{% else %}
+  {% assign has_split_cart = false %}
+{% endif %}
+
+{% comment %} Spanish Date Formatting Logic {% endcomment %}
+{% assign months = "enero,febrero,marzo,abril,mayo,junio,julio,agosto,septiembre,octubre,noviembre,diciembre" | split: "," %}
+{% assign days_es = "domingo,lunes,martes,miércoles,jueves,viernes,sábado" | split: "," %}
+
+{% assign start_day_index = delivery_start | date: "%w" | plus: 0 %}
+{% assign start_day_name = days_es[start_day_index] %}
+{% assign start_day = delivery_start | date: "%-d" %}
+{% assign start_month_index = delivery_start | date: "%m" | minus: 1 %}
+{% assign start_month = months[start_month_index] %}
+{% assign start_year = delivery_start | date: "%Y" %}
+{% capture delivery_start_es %}{{ start_day_name }} {{ start_day }} de {{ start_month }} de {{ start_year }}{% endcapture %}
+
+{% assign end_day_index = delivery_end | date: "%w" | plus: 0 %}
+{% assign end_day_name = days_es[end_day_index] %}
+{% assign end_day = delivery_end | date: "%-d" %}
+{% assign end_month_index = delivery_end | date: "%m" | minus: 1 %}
+{% assign end_month = months[end_month_index] %}
+{% assign end_year = delivery_end | date: "%Y" %}
+{% capture delivery_end_es %}{{ end_day_name }} {{ end_day }} de {{ end_month }} de {{ end_year }}{% endcapture %}
+
+{% capture email_title %}
+  <h2> Entrega estimada </h2>
+  <p>
+    Su pedido será entregado entre el {{ delivery_start_es }} y el {{ delivery_end_es }}.
+  </p> <br/>
+¡Gracias por tu compra!
+{% endcapture %}
+{% capture email_body %}
+  {% if requires_shipping %}
+  {% case delivery_method %}
+      {% when 'pick-up' %}
+        Recibirás un correo electrónico cuando tu pedido esté listo para ser retirado.
+      {% when 'local' %}
+        Hola {{ customer.first_name }}, estamos preparando tu pedido para la entrega.
+      {% else %}
+        Hola {{ customer.first_name }}, estamos preparando tu pedido para enviarlo. Te notificaremos cuando haya sido enviado.
+    {% endcase %}
+      {% if delivery_instructions != blank  %}
+        <p><b>Información de entrega:</b> {{ delivery_instructions }}</p>
+      {% endif %}
+  {% endif %}
+{% endcapture %}

@@ -60,13 +60,15 @@ function ThankYou() {
     return date;
   }
 
-  const formatDate = (date) =>
-    date.toLocaleDateString(languageCode, {
+  const formatDate = (date) => {
+    const formatted = date.toLocaleDateString(languageCode, {
       weekday: "long",
       year: "numeric",
       month: "long",
       day: "numeric",
     });
+    return formatted.replace(/,/g, "");
+  };
 
   let finalMessage = null;
 
