@@ -4,6 +4,7 @@ import {
   useSettings,
   useBuyerJourneyIntercept,
   useLanguage,
+  useTranslate,
   useApplyAttributeChange,
   Checkbox,
   Link,
@@ -17,6 +18,7 @@ export default reactExtension("purchase.checkout.block.render", () => (
 
 function Extension() {
   const settings = useSettings();
+  const translate = useTranslate();
   const { isoCode } = useLanguage();
   const [checked, setChecked] = useState(false);
   const [validationError, setValidationError] = useState("");
@@ -71,7 +73,7 @@ function Extension() {
         reason: "Consent required",
         perform: (result) => {
            if (result.behavior === "block") {
-             setValidationError("This field is required");
+             setValidationError(translate("error_required"));
            }
         }
       };
