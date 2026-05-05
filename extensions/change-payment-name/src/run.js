@@ -32,7 +32,7 @@ export function run(input) {
       paymentMethodNameInclude: "Pagar con tarjeta u otros métodos de pago",
     },
     FR: {
-      paymentMethodNameInclude: "Payer par carte ou autres métodos",
+      paymentMethodNameInclude: "Payer par carte ou autres méthodes",
     },
     IT: {
       paymentMethodNameInclude: "Paga con carta o altri metodi",
