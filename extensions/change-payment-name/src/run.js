@@ -19,9 +19,11 @@ const NO_CHANGES = {
  * @returns {FunctionRunResult}
  */
 export function run(input) {
-  // Extract the language ISO code
-  const locale = input.localization?.language?.isoCode || 'EN'; // Default to 'EN' if no localization
+  // Extract the language ISO code and normalize it (e.g., pt-PT -> PT_PT)
+  const locale = input.localization?.language?.isoCode || 'EN';
+  const normalizedLocale = locale.toUpperCase().replace("-", "_");
 
+  // Hardcoded include names for matching the payment method to rename
   const changeName = {
     EN: {
       paymentMethodNameInclude: "Pay by card or other payment methods",
@@ -30,7 +32,7 @@ export function run(input) {
       paymentMethodNameInclude: "Pagar con tarjeta u otros métodos de pago",
     },
     FR: {
-      paymentMethodNameInclude: "Payer par carte ou autres méthodes",
+      paymentMethodNameInclude: "Payer par carte ou autres métodos",
     },
     IT: {
       paymentMethodNameInclude: "Paga con carta o altri metodi",
@@ -41,7 +43,7 @@ export function run(input) {
     // Add more languages if needed
   };
 
-  // Example: Translation object (can be extended or imported from JSON)
+  // Fallback translations if metafield is not set
   const translations = {
     EN: {
       paymentMethodName: "Other local payment methods",
@@ -50,32 +52,73 @@ export function run(input) {
       paymentMethodName: "Otros métodos de pago locales",
     },
     FR: {
-      paymentMethodName: "Autres méthodes de paiement locales",
+      paymentMethodName: "Vous pouvez également payer via les moyens de paiement locaux disponibles.",
     },
     IT: {
       paymentMethodName: "Altri metodi di pago locali",
     },
     PT_PT: {
-      paymentMethodName: "Outros métodos de pagamento locais", // Corrected translation for PT
+      paymentMethodName: "Outros métodos de pagamento locais",
     },
-    // Add more languages if needed
   };
 
-  // Get translated payment method name based on the locale
-  const translatedName = translations[locale]?.paymentMethodName || translations['EN'].paymentMethodName;
+  // Get translations from shop metafield
+  const metafieldValue = input.shop?.metafield?.value;
+  
+  // Try to get fallback from hardcoded translations using normalized locale
+  let translatedName = translations[normalizedLocale]?.paymentMethodName || 
+                       translations[normalizedLocale.split("_")[0]]?.paymentMethodName || 
+                       translations['EN']?.paymentMethodName || 
+                       "Other local payment methods";
+
+  if (metafieldValue) {
+    try {
+      // The metafield is a list of strings: ["ES : Value", "FR : Value"]
+      const translationList = JSON.parse(metafieldValue);
+      if (Array.isArray(translationList)) {
+        // Find the entry that matches the current locale
+        // Format: "LOCALE : Value"
+        const entry = translationList.find(t => {
+          const parts = t.split(":");
+          if (parts.length < 2) return false;
+          // Normalize the key in the metafield string (e.g., PT-PT -> PT_PT)
+          const key = parts[0].trim().toUpperCase().replace("-", "_");
+          return key === normalizedLocale || key === normalizedLocale.split("_")[0];
+        });
+
+        if (entry) {
+          const parts = entry.split(":");
+          translatedName = parts.slice(1).join(":").trim();
+        } else {
+          // Fallback: search for EN in the list if current locale not found
+          const enEntry = translationList.find(t => t.trim().toUpperCase().startsWith("EN :"));
+          if (enEntry) {
+            const parts = enEntry.split(":");
+            translatedName = parts.slice(1).join(":").trim();
+          }
+        }
+      }
+    } catch (e) {
+      console.error("Error parsing metafield translation value:", e);
+    }
+  }
 
   // Log the current locale and translated name for debugging
-  console.log(`Locale: ${locale}, Translated Name: ${translatedName}`);
+  console.log(`Locale: ${locale}, Normalized: ${normalizedLocale}, Translated Name: ${translatedName}`);
 
   // Find the payment method to rename
+  // We use the normalized locale (e.g., PT_PT) to look up the matching string
+  const nameToMatch = changeName[normalizedLocale]?.paymentMethodNameInclude || 
+                      changeName[normalizedLocale.split("_")[0]]?.paymentMethodNameInclude;
+
   const changePaymentMethodName = input.paymentMethods
-    .find(method => method.name.includes(changeName[locale]?.paymentMethodNameInclude));
+    .find(method => nameToMatch && method.name.includes(nameToMatch));
 
   // Log the matching payment method for debugging
   if (changePaymentMethodName) {
     console.log(`Matched Payment Method: ${changePaymentMethodName.name}`);
   } else {
-    console.log("No matching payment method found.");
+    console.log(`No matching payment method found for name like: ${nameToMatch}`);
   }
 
   if (!changePaymentMethodName) {

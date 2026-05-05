@@ -1,4 +1,4 @@
-api_version = "2025-04"
+api_version = "2026-04"
 
 [[extensions]]
 name = "t:name"
@@ -14,6 +14,10 @@ description = "t:description"
   target = "purchase.payment-customization.run"
   input_query = "src/run.graphql"
   export = "run"
+
+  [[extensions.metafields]]
+  namespace = "custom"
+  key = "payment_method_name"
 
   [extensions.build]
   command = ""

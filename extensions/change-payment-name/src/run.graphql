@@ -15,4 +15,9 @@ query RunInput {
     id
     name
   }
+  shop {
+    metafield(namespace: "custom", key: "payment_method_name") {
+      value
+    }
+  }
 }
